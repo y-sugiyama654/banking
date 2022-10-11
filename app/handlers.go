@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/y-sugiyama654/banking/errs"
 	"github.com/y-sugiyama654/banking/service"
 	"net/http"
 )
@@ -38,8 +39,9 @@ func (ch *CustomerHandlers) getCustomer(w http.ResponseWriter, r *http.Request) 
 	customer, err := ch.service.GetCustomer(id)
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, err.Error())
+		w.WriteHeader(err.Code)
+		fmt.Fprintf(w, err.Message)
+		errs.NewNotFoundError("not found.")
 	} else {
 		w.Header().Add("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(customer)
