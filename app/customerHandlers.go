@@ -3,18 +3,10 @@ package app
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/y-sugiyama654/banking/errs"
 	"github.com/y-sugiyama654/banking/service"
 	"net/http"
 )
-
-type Customer struct {
-	Name    string `json:"full_name" xml:"full_name"`
-	City    string `json:"city" xml:"city"`
-	Zipcode string `json:"zip_code" xml:"zip_code"`
-}
 
 type CustomerHandlers struct {
 	service service.CustomerService
@@ -39,11 +31,16 @@ func (ch *CustomerHandlers) getCustomer(w http.ResponseWriter, r *http.Request) 
 	customer, err := ch.service.GetCustomer(id)
 
 	if err != nil {
-		w.WriteHeader(err.Code)
-		fmt.Fprintf(w, err.Message)
-		errs.NewNotFoundError("not found.")
+		writeResponse(w, err.Code, err.AsMessage())
 	} else {
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(customer)
+		writeResponse(w, http.StatusOK, customer)
+	}
+}
+
+func writeResponse(w http.ResponseWriter, code int, data interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(code)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		panic(err)
 	}
 }
