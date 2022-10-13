@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/y-sugiyama654/banking/service"
 	"net/http"
@@ -13,12 +14,40 @@ type CustomerHandlers struct {
 
 func (ch *CustomerHandlers) getAllCustomer(w http.ResponseWriter, r *http.Request) {
 	customers, err := ch.service.GetAllCustomer()
-	
+
 	if err != nil {
 		writeResponse(w, err.Code, err.AsMessage())
 	} else {
 		writeResponse(w, http.StatusOK, customers)
 	}
+}
+
+func (ch *CustomerHandlers) getAllCustomerByStatus(w http.ResponseWriter, r *http.Request) {
+	status := r.URL.Query().Get("status")
+
+	if status == "" {
+		ch.getAllCustomer(w, r)
+	}
+
+	customers, err := ch.service.GetAllCustomerByStatus(status)
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+	} else {
+		writeResponse(w, http.StatusOK, customers)
+	}
+}
+
+func (ch *CustomerHandlers) getCustomerByStatus(w http.ResponseWriter, r *http.Request) {
+	status := r.URL.Query().Get("status")
+	fmt.Println(status)
+
+	//customers, err := ch.service.GetAllCustomer()
+	//
+	//if err != nil {
+	//	writeResponse(w, err.Code, err.AsMessage())
+	//} else {
+	//	writeResponse(w, http.StatusOK, customers)
+	//}
 }
 
 func (ch *CustomerHandlers) getCustomer(w http.ResponseWriter, r *http.Request) {
