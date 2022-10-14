@@ -14,7 +14,6 @@ func Start() {
 	// wiring
 	ch := CustomerHandlers{service.NewCustomerRepository(domain.NewCustomerRepositoryDb())}
 	// define routes
-	router.HandleFunc("/customers", ch.getAllCustomerByStatus).Methods(http.MethodGet).Queries("status", "{status}")
 	router.HandleFunc("/customers", ch.getAllCustomer).Methods(http.MethodGet)
 	router.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomer).Methods(http.MethodGet)
 

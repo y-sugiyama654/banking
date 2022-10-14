@@ -13,11 +13,18 @@ type CustomerRepositoryDb struct {
 	client *sql.DB
 }
 
-func (d CustomerRepositoryDb) FindAll() ([]Customer, *errs.AppError) {
+func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError) {
+	var rows *sql.Rows
+	var err error
 
-	findAllSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers"
-
-	rows, err := d.client.Query(findAllSql)
+	if status == "" {
+		findAllSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers"
+		rows, err = d.client.Query(findAllSql)
+	} else {
+		findAllSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = ?"
+		rows, err = d.client.Query(findAllSql, status)
+	}
+	
 	if err != nil {
 		logger.Error("Error while querying customer table" + err.Error())
 		return nil, errs.NewUnexpectedError("Unexpected database error")
@@ -29,34 +36,6 @@ func (d CustomerRepositoryDb) FindAll() ([]Customer, *errs.AppError) {
 		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
 		if err != nil {
 			logger.Error("Error while scanning customers" + err.Error())
-			return nil, errs.NewUnexpectedError("Unexpected database error")
-		}
-		customers = append(customers, c)
-	}
-	return customers, nil
-}
-
-func (d CustomerRepositoryDb) FindAllByStatus(status string) ([]Customer, *errs.AppError) {
-	var flg string
-	if status == "active" {
-		flg = "1"
-	} else if status == "inactive" {
-		flg = "0"
-	}
-	findAllSqlByStatus := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = ?"
-
-	rows, err := d.client.Query(findAllSqlByStatus, flg)
-	if err != nil {
-		log.Println("Error while querying customer table" + err.Error())
-		return nil, errs.NewUnexpectedError("Unexpected database error")
-	}
-
-	customers := make([]Customer, 0)
-	for rows.Next() {
-		var c Customer
-		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
-		if err != nil {
-			log.Println("Error while scanning customers" + err.Error())
 			return nil, errs.NewUnexpectedError("Unexpected database error")
 		}
 		customers = append(customers, c)
