@@ -45,6 +45,6 @@ func (s DefaultCustomerService) GetCustomer(id string) (*dto.CustomerResponse, *
 	return &response, nil
 }
 
-func NewCustomerRepository(repository domain.CustomerRepository) DefaultCustomerService {
+func NewCustomerService(repository domain.CustomerRepository) DefaultCustomerService {
 	return DefaultCustomerService{repository}
 }
