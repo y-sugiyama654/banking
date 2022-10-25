@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const dbTSLayout = "2006-01-02 15:04:05"
+
 type AccountService interface {
 	NewAccount(dto.NewAccountRequest) (*dto.NewAccountResponse, *errs.AppError)
 	MakeTransaction(dto.TransactionRequest) (*dto.TransactionResponse, *errs.AppError)
@@ -23,20 +25,12 @@ func (s DefaultAccountService) NewAccount(req dto.NewAccountRequest) (*dto.NewAc
 		return nil, err
 	}
 
-	a := domain.Account{
-		AccountId:   "",
-		CustomerId:  req.CustomerId,
-		OpeningDate: time.Now().Format("2006-01-02 15:04:05"),
-		AccountType: req.AccountType,
-		Amount:      req.Amount,
-		Status:      "1",
-	}
-	newAccount, err := s.repo.Save(a)
+	account := domain.NewAccount(req.CustomerId, req.AccountType, req.Amount)
+	newAccount, err := s.repo.Save(account)
 	if err != nil {
 		return nil, err
 	}
-	response := newAccount.ToNewAccountResponseDto()
-	return &response, nil
+	return newAccount.ToNewAccountResponseDto(), nil
 }
 
 func (s DefaultAccountService) MakeTransaction(req dto.TransactionRequest) (*dto.TransactionResponse, *errs.AppError) {
@@ -62,7 +56,7 @@ func (s DefaultAccountService) MakeTransaction(req dto.TransactionRequest) (*dto
 		AccountId:       req.AccountId,
 		Amount:          req.Amount,
 		TransactionType: req.TransactionType,
-		TransactionDate: time.Now().Format("2006-01-02 15:04:05"),
+		TransactionDate: time.Now().Format(dbTSLayout),
 	}
 	transaction, appError := s.repo.SaveTransaction(t)
 	if appError != nil {
