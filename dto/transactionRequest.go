@@ -13,18 +13,19 @@ const WITHDRAWAL string = "withdrawal"
 const DEPOSIT string = "deposit"
 
 func (r TransactionRequest) Validate() *errs.AppError {
-	if r.TransactionType != WITHDRAWAL && r.TransactionType != DEPOSIT {
+	if !r.IsTransactionTypeWithdrawal() && !r.IsTransactionTypeDeposit() {
 		return errs.NewValidationError("Transaction type can only be deposit or withdrawal")
 	}
 	if r.Amount < 0 {
-		return errs.NewValidationError("s")
+		return errs.NewValidationError("Amount cannot be less than zero.")
 	}
 	return nil
 }
 
 func (r TransactionRequest) IsTransactionTypeWithdrawal() bool {
-	if r.TransactionType == WITHDRAWAL {
-		return true
-	}
-	return false
+	return r.TransactionType == WITHDRAWAL
+}
+
+func (r TransactionRequest) IsTransactionTypeDeposit() bool {
+	return r.TransactionType == DEPOSIT
 }
