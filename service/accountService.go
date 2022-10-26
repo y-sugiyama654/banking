@@ -1,9 +1,9 @@
 package service
 
 import (
+	"github.com/y-sugiyama654/banking-lib/errs"
 	"github.com/y-sugiyama654/banking/domain"
 	"github.com/y-sugiyama654/banking/dto"
-	"github.com/y-sugiyama654/banking/errs"
 	"time"
 )
 

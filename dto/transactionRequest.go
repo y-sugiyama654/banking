@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/y-sugiyama654/banking/errs"
+import "github.com/y-sugiyama654/banking-lib/errs"
 
 type TransactionRequest struct {
 	CustomerId      string  `json:"customer_id"`
